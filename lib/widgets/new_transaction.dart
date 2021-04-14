@@ -1,28 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
-  final Function addNewTransaction;
+  final Function addTx;
 
-  NewTransaction(this.addNewTransaction);
+  NewTransaction(this.addTx);
 
   @override
   _NewTransactionState createState() => _NewTransactionState();
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final titleController = TextEditingController();
+  final _titleController = TextEditingController();
 
-  final amountController = TextEditingController();
+  final _amountController = TextEditingController();
 
-  void submitData() {
-    final enteredTitle = titleController.text;
-    final enteredAmount = double.parse(amountController.text);
-    if (enteredTitle.isEmpty || enteredAmount <= 0) {
+  DateTime _selectedDate;
+
+  void _submitData() {
+    if (_amountController.text.isEmpty) {
       return;
     }
-    widget.addNewTransaction(enteredTitle, enteredAmount);
+    final enteredTitle = _titleController.text;
+    final enteredAmount = double.parse(_amountController.text);
+
+    if (enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null) {
+      return;
+    }
+
+    widget.addTx(
+      enteredTitle,
+      enteredAmount,
+      _selectedDate,
+    );
 
     Navigator.of(context).pop();
+  }
+
+  void _precentDatePicker() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2019),
+            lastDate: DateTime.now())
+        .then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      _selectedDate = pickedDate;
+      setState(() {});
+    });
+    print('...');
   }
 
   @override
@@ -33,31 +61,49 @@ class _NewTransactionState extends State<NewTransaction> {
         padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
+          children: <Widget>[
             TextField(
               decoration: InputDecoration(labelText: 'Title'),
-              // onChanged: (value) {
-              //   titleInput = value;
+              controller: _titleController,
+              onSubmitted: (_) => _submitData(),
+              // onChanged: (val) {
+              //   titleInput = val;
               // },
-              controller: titleController,
-              onSubmitted: (_) => submitData(),
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Amount'),
+              controller: _amountController,
               keyboardType: TextInputType.number,
-              onSubmitted: (_) => submitData(),
-              // onChanged: (value) {
-              //   amountInput = value;
-              // },
-              controller: amountController,
+              onSubmitted: (_) => _submitData(),
+              // onChanged: (val) => amountInput = val,
             ),
-            TextButton(
-              style: ButtonStyle(
-                foregroundColor:
-                    MaterialStateProperty.all<Color>(Colors.purple),
+            Container(
+              height: 70,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _selectedDate == null
+                          ? 'No Date Chossen!'
+                          : 'Picked Date: ${DateFormat.yMd().format(_selectedDate)}',
+                    ),
+                  ),
+                  FlatButton(
+                    textColor: Theme.of(context).primaryColor,
+                    onPressed: _precentDatePicker,
+                    child: Text(
+                      'Choose Date',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
               ),
-              onPressed: submitData,
+            ),
+            RaisedButton(
               child: Text('Add Transaction'),
+              textColor: Theme.of(context).textTheme.button.color,
+              color: Theme.of(context).primaryColor,
+              onPressed: _submitData,
             ),
           ],
         ),

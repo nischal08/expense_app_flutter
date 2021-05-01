@@ -27,7 +27,7 @@ class TransactionList extends StatelessWidget {
                     height: 20,
                   ),
                   Container(
-                    height: constraints.maxHeight*0.60,
+                    height: constraints.maxHeight * 0.60,
                     child: Image.asset(
                       'assets/images/waiting.png',
                       fit: BoxFit.cover,
@@ -46,13 +46,33 @@ class TransactionList extends StatelessWidget {
                   horizontal: 5,
                 ),
                 child: ListTile(
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => deleteTx(
-                      transactions[index].id,
-                    ),
-                    color: Theme.of(context).errorColor,
-                  ),
+                  trailing: MediaQuery.of(context).size.width > 460
+                      ? TextButton.icon(
+                          // style: ButtonStyle(
+                          //   backgroundColor: MaterialStateProperty.all<Color>(
+                          //     Theme.of(context).errorColor,
+                          //   ),
+                          // ),
+                          onPressed: () => deleteTx(
+                            transactions[index].id,
+                          ),
+                          icon: Icon(
+                            Icons.delete,
+                            color: Theme.of(context).errorColor,
+                          ),
+                          label: Text(
+                            'Delete',
+                            style:
+                                TextStyle(color: Theme.of(context).errorColor),
+                          ),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => deleteTx(
+                            transactions[index].id,
+                          ),
+                          color: Theme.of(context).errorColor,
+                        ),
                   title: Text(
                     transactions[index].title,
                     style: Theme.of(context).textTheme.title,

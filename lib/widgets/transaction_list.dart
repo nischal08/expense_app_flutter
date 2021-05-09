@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:personal_expense_app/widgets/transaction_item.dart';
@@ -39,15 +41,16 @@ class TransactionList extends StatelessWidget {
               );
             },
           )
-        : ListView.builder(
-            itemBuilder: (ctx, index) {
-              return TransactionItem(
-                deleteTx: deleteTx,
-                transaction: transactions[index],
-              );
-            },
-            itemCount: transactions.length,
+        : ListView(
+            children: transactions
+                .map(
+                  (tx) => TransactionItem(
+                    key: ValueKey(tx.id),
+                    deleteTx: deleteTx,
+                    transaction: tx,
+                  ),
+                  )
+                .toList(),
           );
   }
 }
-
